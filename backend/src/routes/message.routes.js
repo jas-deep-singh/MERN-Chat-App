@@ -1,5 +1,5 @@
 import Router from "express";
-import { verifyJWT } from "../middlewares/auth.middlewares";
+import { verifyJWT } from "../middlewares/auth.middlewares.js";
 import { getMessages, getUsersForSidebar, sendMessage } from "../controllers/message.controllers.js";
 
 const router = Router();

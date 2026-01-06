@@ -38,7 +38,6 @@ const SignUpPage = () => {
     e.preventDefault();
     const success = validateForm();
     if(success === true) {
-      console.log(formData);
       signup(formData);
     }
   }
@@ -154,4 +153,4 @@ const SignUpPage = () => {
   )
 }
 
-export default SignUpPage
+export default SignUpPage;
