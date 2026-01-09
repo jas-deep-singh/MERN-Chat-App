@@ -21,7 +21,7 @@ import authRoutes from "./routes/auth.routes.js";
 app.use("/api/auth", authRoutes);
 
 import messageRoutes from "./routes/message.routes.js";
-app.use("/api/message", messageRoutes);
+app.use("/api/messages", messageRoutes);
 
 connectDB()
     .then(() => {
