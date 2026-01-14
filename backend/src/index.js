@@ -3,12 +3,11 @@ import dotenv from "dotenv";
 import connectDB from "./lib/connectDb.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { app, server } from "./lib/socket.js";
 
 dotenv.config();
 
 const port = process.env.PORT || 3000;
-
-const app = express();
 
 app.use(cookieParser());
 app.use(express.json());
@@ -25,7 +24,7 @@ app.use("/api/messages", messageRoutes);
 
 connectDB()
     .then(() => {
-        app.listen(port, () => {
+        server.listen(port, () => {
             console.log(`Listening on http://localhost:${port}`)
         })
     })

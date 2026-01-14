@@ -7,7 +7,7 @@ const ProfilePage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const handleImageUpload = async(e) => {
-    const file = e.target.file[0];
+    const file = e.target.files[0];
     if(!file) {
       return;
     }

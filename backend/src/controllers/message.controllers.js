@@ -4,13 +4,14 @@ import { apiResponse } from "../utils/apiResponse.utils.js";
 import User from "../models/user.models.js";
 import Message from "../models/message.models.js";
 import cloudinary from "../lib/cloudinary.js";
+import { getRaceiverSocketId, io } from "../lib/socket.js";
 
 const getUsersForSidebar = asyncHandler(async(req, res) => {
     const filteredUsers = await User.find({_id: {$ne: req.user._id}}).select("-password -refreshToken");
     if(!filteredUsers) {
         throw new apiError(500, "Internal server error. Cannot fetch users");
     }
-    return res.status(200).json(new apiResponse(200, "Users fetched successfully", {filteredUsers}));
+    return res.status(200).json(new apiResponse(200, "Users fetched successfully", filteredUsers));
 });
 
 const getMessages = asyncHandler(async(req, res) => {
@@ -32,18 +33,29 @@ const sendMessage = asyncHandler(async(req, res) => {
     const {text, image} = req.body;
     const {id: receiverId} = req.params;
     const myId = req.user._id;
+    console.log("TEXT AND IMAGE : ", text, image);
+    console.log("MYID : ", myId);
+    console.log("RECEIVER ID : ", receiverId);
     let imageUrl;
     if(image) {
         const uploadResponse = await cloudinary.uploader.upload(image);
         imageUrl = uploadResponse.secure_url;
     }
     const newMessage = new Message({
-        myId,
+        senderId: myId,
         receiverId,
         text, 
         image: imageUrl
     });
+    console.log("CREATED MESSAGE : ", newMessage);
     const sentMessage = await newMessage.save();
+
+    //realtime chatting
+    const receiverSocketId = getRaceiverSocketId(receiverId);
+    if(receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
     if(!sentMessage) {
         throw new apiError(500, "Internal server error. Error sending message");
     }
