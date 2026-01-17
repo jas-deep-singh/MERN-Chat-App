@@ -103,7 +103,7 @@ const updateProfilePic = asyncHandler(async(req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
-            profilePic: uploadProfilePic.secure_url
+            profilePic: uploadProfilePic.secure_url 
         },
         {new: true}
     );

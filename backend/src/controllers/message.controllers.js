@@ -4,29 +4,28 @@ import { apiResponse } from "../utils/apiResponse.utils.js";
 import User from "../models/user.models.js";
 import Message from "../models/message.models.js";
 import cloudinary from "../lib/cloudinary.js";
-import { getRaceiverSocketId, io } from "../lib/socket.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 
-const getUsersForSidebar = asyncHandler(async(req, res) => {
-    const filteredUsers = await User.find({_id: {$ne: req.user._id}}).select("-password -refreshToken");
+const getUsersForSidebar = asyncHandler(async (req, res) => {
+    const loggedInUserId = req.user._id;
+    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
     if(!filteredUsers) {
-        throw new apiError(500, "Internal server error. Cannot fetch users");
+        return new apiError(500, "error getting users", error)
     }
-    return res.status(200).json(new apiResponse(200, "Users fetched successfully", filteredUsers));
+    res.status(200).json(filteredUsers);
 });
 
-const getMessages = asyncHandler(async(req, res) => {
-    const {id: userToChatId} = req.params;
+const getMessages = asyncHandler(async (req, res) => {
+    const { id: userToChatId } = req.params;
     const myId = req.user._id;
+
     const messages = await Message.find({
-        $or: [
-            {senderId: myId, receiverId: userToChatId},
-            {senderId: userToChatId, receiverId: myId}
-        ]
+      $or: [
+        { senderId: myId, receiverId: userToChatId },
+        { senderId: userToChatId, receiverId: myId },
+      ],
     });
-    if(!messages) {
-        throw new apiError(500, "Internal server error. Cannot fetch messages");
-    }
-    return res.status(200).json(new apiResponse(200, "Messages fetched successfully"));
+    res.status(200).json(messages);
 });
 
 const sendMessage = asyncHandler(async(req, res) => {
@@ -48,18 +47,16 @@ const sendMessage = asyncHandler(async(req, res) => {
         image: imageUrl
     });
     console.log("CREATED MESSAGE : ", newMessage);
-    const sentMessage = await newMessage.save();
 
-    //realtime chatting
-    const receiverSocketId = getRaceiverSocketId(receiverId);
+    //realtime chatting 
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    console.log("RECEIVER SOCKET ID : ", receiverSocketId);
+    console.log("IO : ", io);
+    await newMessage.save();
     if(receiverSocketId) {
         io.to(receiverSocketId).emit("newMessage", newMessage);
     }
-
-    if(!sentMessage) {
-        throw new apiError(500, "Internal server error. Error sending message");
-    }
-    res.status(200).json(new apiResponse(200, "message sent successfully", sentMessage));
+    res.status(200).json(new apiResponse(200, "message sent successfully", newMessage));
 });
 
 export {getUsersForSidebar, getMessages, sendMessage};

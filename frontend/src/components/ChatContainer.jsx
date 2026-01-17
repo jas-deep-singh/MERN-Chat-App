@@ -25,7 +25,7 @@ const ChatContainer = () => {
     }
   }, [messages])
 
-  messages.map((message) => (console.log("MESSAGE : ", message.data._id)));
+  messages.map((message) => (console.log("MESSAGE : ", message._id)));
 
   if(isMessagesLoading) {
     return (
@@ -39,11 +39,10 @@ const ChatContainer = () => {
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
-
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
-          <div
-            key={message.data._id}
+          <div 
+            key={message._id}
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
             ref={messageEndRef}
           >
