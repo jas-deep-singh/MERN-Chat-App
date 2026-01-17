@@ -33,7 +33,7 @@ const sendMessage = asyncHandler(async(req, res) => {
     const {id: receiverId} = req.params;
     const myId = req.user._id;
     console.log("TEXT AND IMAGE : ", text, image);
-    console.log("MYID : ", myId);
+    console.log("MYID : ", myId); 
     console.log("RECEIVER ID : ", receiverId);
     let imageUrl;
     if(image) {

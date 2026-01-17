@@ -5,7 +5,7 @@ import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
-  users: [],
+  users: [], 
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
@@ -30,7 +30,7 @@ export const useChatStore = create((set, get) => ({
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-      set({ isMessagesLoading: false });
+      set({ isMessagesLoading: false }); 
     }
   },
   sendMessage: async (messageData) => {
